@@ -1,0 +1,230 @@
+/** Draws and maintains a fake Windows 95-style desktop */
+class Desktop {
+    field int dummy;  // Placeholder field for memory allocation
+    
+    constructor Desktop new() {
+        let dummy = 0;
+        do draw();
+        return this;
+    }
+    
+    /** Draws the complete desktop with icons and taskbar */
+    method void draw() {
+        do Screen.clearScreen();
+        
+        // Draw title at top (no underline)
+        do Screen.setColor(true);
+        do Output.moveCursor(1, 19);
+        do Output.printString("DESKTOP DESTROYER");
+        
+        // Draw desktop icons with custom names
+        do drawIconWithLabel(40, 35, 1, "Sarel");      // Computer
+        do drawIconWithLabel(100, 35, 2, "Tomer");     // Folder
+        do drawIconWithLabel(160, 35, 2, "Yuval");     // Folder
+        do drawIconWithLabel(220, 35, 3, 0);           // Recycle Bin (no custom name)
+        
+        do drawIconWithLabel(40, 95, 2, "Adi");        // Folder
+        do drawIconWithLabel(100, 95, 2, "Rona");      // Folder
+        do drawIconWithLabel(160, 95, 1, "PC");        // Computer
+        do drawIconWithLabel(220, 95, 2, "Files");     // Folder
+        
+        do drawIconWithLabel(40, 155, 2, "Work");      // Folder
+        do drawIconWithLabel(100, 155, 3, 0);          // Bin (no custom name)
+        do drawIconWithLabel(160, 155, 2, "Games");    // Folder
+        do drawIconWithLabel(220, 155, 2, "Docs");     // Folder
+        
+        // Draw taskbar at bottom
+        do drawTaskbar();
+        
+        return;
+    }
+    
+    /** Restores the desktop to clean state */
+    method void restore() {
+        do draw();
+        return;
+    }
+    
+    method void drawWindow(int x, int y, int width, int height, String title) {
+        /** Draws a Windows 95 style window with title bar */
+        
+        // Draw outer border
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        
+        // Draw inner white area
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x + 2, y + 20, x + width - 2, y + height - 2);
+        
+        // Draw title bar (dark)
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x + 2, y + 2, x + width - 2, y + 18);
+        
+        // Draw title text
+        do Screen.setColor(false);
+        do Output.moveCursor((y + 10) / 11, (x + 8) / 8);
+        do Output.printString(title);
+        
+        // Draw close button (X)
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x + width - 18, y + 4, x + width - 4, y + 16);
+        do Screen.setColor(true);
+        do Screen.drawLine(x + width - 16, y + 6, x + width - 6, y + 14);
+        do Screen.drawLine(x + width - 6, y + 6, x + width - 16, y + 14);
+        
+        // Draw some fake content lines
+        do Screen.setColor(true);
+        do Screen.drawLine(x + 10, y + 30, x + width - 10, y + 30);
+        do Screen.drawLine(x + 10, y + 40, x + width - 30, y + 40);
+        do Screen.drawLine(x + 10, y + 50, x + width - 20, y + 50);
+        
+        return;
+    }
+    
+    /** Draws a desktop icon with custom label */
+    method void drawIconWithLabel(int x, int y, int iconType, String customLabel) {
+        var String label;
+        
+        // Draw icon box (32x32 pixels)
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + 28, y + 28);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x + 2, y + 2, x + 26, y + 26);
+        
+        // Draw icon specific graphics
+        if (iconType = 1) {
+            // My Computer - draw monitor shape
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x + 8, y + 8, x + 20, y + 18);
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x + 10, y + 10, x + 18, y + 16);
+            do Screen.setColor(true);
+            do Screen.drawLine(x + 11, y + 19, x + 17, y + 22);
+            let label = customLabel;
+        }
+        
+        if (iconType = 2) {
+            // Folder - draw folder shape
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x + 6, y + 12, x + 22, y + 22);
+            do Screen.drawRectangle(x + 6, y + 10, x + 14, y + 12);
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x + 8, y + 14, x + 20, y + 20);
+            let label = customLabel;
+        }
+        
+        if (iconType = 3) {
+            // Recycle Bin - draw bin shape
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x + 8, y + 14, x + 20, y + 24);
+            do Screen.drawRectangle(x + 10, y + 10, x + 18, y + 14);
+            do Screen.setColor(false);
+            do Screen.drawLine(x + 12, y + 16, x + 12, y + 22);
+            do Screen.drawLine(x + 16, y + 16, x + 16, y + 22);
+            let label = "Bin";
+        }
+        
+        // Draw label below icon (only if not empty)
+        if (~(customLabel = 0)) {
+            do Screen.setColor(true);
+            do Output.moveCursor((y + 32) / 11, (x - 8) / 8);
+            do Output.printString(label);
+        }
+        
+        return;
+    }
+    
+    /** Draws a desktop icon at specified position */
+    method void drawIcon(int x, int y, int iconType) {
+        var String label;
+        
+        // Draw icon box (32x32 pixels)
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + 28, y + 28);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x + 2, y + 2, x + 26, y + 26);
+        
+        // Draw icon specific graphics
+        if (iconType = 1) {
+            // My Computer - draw monitor shape
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x + 8, y + 8, x + 20, y + 18);
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x + 10, y + 10, x + 18, y + 16);
+            do Screen.setColor(true);
+            do Screen.drawLine(x + 11, y + 19, x + 17, y + 22);
+            let label = "PC";
+        }
+        
+        if (iconType = 2) {
+            // Folder - draw folder shape
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x + 6, y + 12, x + 22, y + 22);
+            do Screen.drawRectangle(x + 6, y + 10, x + 14, y + 12);
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x + 8, y + 14, x + 20, y + 20);
+            let label = "Folder";
+        }
+        
+        if (iconType = 3) {
+            // Recycle Bin - draw bin shape
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x + 8, y + 14, x + 20, y + 24);
+            do Screen.drawRectangle(x + 10, y + 10, x + 18, y + 14);
+            do Screen.setColor(false);
+            do Screen.drawLine(x + 12, y + 16, x + 12, y + 22);
+            do Screen.drawLine(x + 16, y + 16, x + 16, y + 22);
+            let label = "Bin";
+        }
+        
+        // Draw label below icon
+        do Screen.setColor(true);
+        do Output.moveCursor((y + 32) / 11, (x - 4) / 8);
+        do Output.printString(label);
+        
+        return;
+    }
+    
+    /** Draws the Windows 95 style taskbar at bottom */
+    method void drawTaskbar() {
+        
+        // Draw taskbar background (dark bar)
+        do Screen.setColor(true);
+        do Screen.drawRectangle(0, 240, 511, 255);
+        
+        // Draw Start button
+        do Screen.setColor(false);
+        do Screen.drawRectangle(2, 242, 50, 253);
+        do Screen.setColor(true);
+        do Screen.drawRectangle(2, 242, 3, 253);
+        do Screen.drawRectangle(2, 242, 50, 243);
+        do Output.moveCursor(22, 1);
+        do Output.printString("Start");
+        
+        // Draw separator line
+        do Screen.setColor(false);
+        do Screen.drawLine(52, 242, 52, 253);
+        
+        // Draw fake program button
+        do Screen.setColor(false);
+        do Screen.drawRectangle(54, 242, 130, 253);
+        do Screen.setColor(true);
+        do Output.moveCursor(22, 8);
+        do Output.printString("Program1");
+        
+        // Draw clock area
+        do Screen.setColor(false);
+        do Screen.drawRectangle(460, 242, 509, 253);
+        do Screen.setColor(true);
+        do Output.moveCursor(22, 58);
+        do Output.printString("12:00");
+        
+        return;
+    }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}
+

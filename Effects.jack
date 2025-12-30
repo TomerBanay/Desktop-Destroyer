@@ -1,0 +1,146 @@
+/** Static helper class for visual effects and animations */
+class Effects {
+    /** Draw a crack line at specified angle (0-7 for 8 directions) */
+    function void drawCrack(int x, int y, int angle, int length) {
+        var int endX, endY;
+        var int dx, dy;
+        
+        /* Calculate end point based on angle
+          0=right, 1=down-right, 2=down, 3=down-left, 4=left, 5=up-left, 6=up, 7=up-right */
+        if (angle = 0) { let dx = length; let dy = 0; }
+        if (angle = 1) { let dx = length; let dy = length; }
+        if (angle = 2) { let dx = 0; let dy = length; }
+        if (angle = 3) { let dx = -length; let dy = length; }
+        if (angle = 4) { let dx = -length; let dy = 0; }
+        if (angle = 5) { let dx = -length; let dy = -length; }
+        if (angle = 6) { let dx = 0; let dy = -length; }
+        if (angle = 7) { let dx = length; let dy = -length; }
+        
+        let endX = x + dx;
+        let endY = y + dy;
+        
+        // Draw main crack line
+        do Screen.setColor(true);
+        do Screen.drawLine(x, y, endX, endY);
+        
+        /* Draw small branch crack */
+        if (length > 10) {
+            do Screen.drawLine(endX - 3, endY, endX + 3, endY);
+            do Screen.drawLine(endX, endY - 3, endX, endY + 3);
+        }
+        return;
+    }
+    
+    /** Draw a small bullet hole impact */
+    function void drawBulletHole(int x, int y) {
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, 2); // Draw center dark spot
+        
+        // Draw impact marks
+        do Screen.drawLine(x - 4, y - 4, x - 2, y - 2);
+        do Screen.drawLine(x + 2, y - 2, x + 4, y - 4);
+        do Screen.drawLine(x - 4, y + 4, x - 2, y + 2);
+        do Screen.drawLine(x + 2, y + 2, x + 4, y + 4);
+        
+        return;
+    }
+    
+    /** Draw a jagged line from (x1,y1) to (x2,y2) */
+    function void drawJaggedLine(int x1, int y1, int x2, int y2) {
+        var int steps, i;
+        var int currentX, currentY;
+        var int nextX, nextY;
+        var int dx, dy;
+        var int offsetX, offsetY;
+        
+        let steps = 8;
+        let dx = (x2 - x1) / steps;
+        let dy = (y2 - y1) / steps;
+        
+        let currentX = x1;
+        let currentY = y1;
+        
+        do Screen.setColor(true);
+        
+        let i = 0;
+        while (i < steps) {
+            let nextX = currentX + dx;
+            let nextY = currentY + dy;
+            
+            // Add random-looking offset
+            let offsetX = ((i * 7) & 3) - 1;  // -1 to 2
+            let offsetY = ((i * 11) & 3) - 1;
+            
+            let nextX = nextX + offsetX;
+            let nextY = nextY + offsetY;
+            
+            // Draw thick jagged line
+            do Screen.drawLine(currentX, currentY, nextX, nextY);
+            do Screen.drawLine(currentX + 1, currentY, nextX + 1, nextY);
+            
+            let currentX = nextX;
+            let currentY = nextY;
+            let i = i + 1;
+        }
+        return;
+    }
+    
+    /** Animate washing effect - horizontal line sweeping down */
+    function void animateWash(int startY, int endY) {
+        var int y;
+        let y = startY;
+        do Screen.setColor(false);
+        while (y < endY) {
+            do Screen.drawLine(0, y, 511, y);
+            do Screen.drawLine(0, y + 1, 511, y + 1);
+            do Sys.wait(5);
+            let y = y + 4;
+        }
+        return;
+    }
+    
+    /** Draw explosion effect at point */
+    function void drawExplosion(int x, int y, int size) {
+        var int i;
+        do Screen.setColor(true);
+        
+        // Draw radiating lines
+        let i = 0;
+        while (i < 8) {
+            do Effects.drawCrack(x, y, i, size);
+            let i = i + 1;
+        }
+        
+        // Draw center blast
+        do Screen.drawCircle(x, y, size / 2);
+        
+        return;
+    }
+    
+    /** Draw shatter effect with multiple cracks */
+    function void drawShatter(int x, int y) {
+        var int i;
+        
+        // Draw impact crater
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, 12);
+        
+        // Draw radiating cracks with animation
+        let i = 0;
+        while (i < 8) {
+            do Effects.drawCrack(x, y, i, 20);
+            do Sys.wait(20);
+            let i = i + 1;
+        }
+        
+        // Draw secondary cracks
+        let i = 0;
+        while (i < 8) {
+            do Effects.drawCrack(x, y, i, 30);
+            let i = i + 1;
+        }
+        return;
+    }
+}
+
+

@@ -1,0 +1,92 @@
+/** Manages the movable cursor for weapon targeting */
+class Cursor {
+    field int x, y;
+    field int weaponType;
+    field boolean visible;
+    
+    constructor Cursor new(int startX, int startY) {
+        let x = startX;
+        let y = startY;
+        let weaponType = 1;  // Default: Hammer
+        let visible = true;
+        return this;
+    }
+
+    /** Move cursor by delta, constrain to screen bounds */
+    method void move(int dx, int dy) {
+        // Update position with bounds checking
+        let x = x + dx;
+        let y = y + dy;
+        
+        // Constrain to screen bounds (leaving margin for cursor size)
+        if (x < 20) { let x = 20; }
+        if (x > 491) { let x = 491; }
+        if (y < 20) { let y = 20; }
+        if (y > 220) { let y = 220; }  // Leave room for taskbar
+        
+        return;
+    }
+
+    /** Draw ultra-minimal crosshair cursor */
+    method void draw() {
+        do Screen.setColor(true);
+        
+        // Tiny crosshair (only 3 pixels in each direction, no center)
+        do Screen.drawLine(x - 3, y, x - 1, y);
+        do Screen.drawLine(x + 1, y, x + 3, y);
+        do Screen.drawLine(x, y - 3, x, y - 1);
+        do Screen.drawLine(x, y + 1, x, y + 3);
+        
+        return;
+    }
+
+    /** Erase cursor by drawing white where it was */
+    method void erase() {
+        do Screen.setColor(false);
+        
+        // Erase the tiny crosshair (3 pixels in each direction)
+        do Screen.drawLine(x - 3, y, x - 1, y);
+        do Screen.drawLine(x + 1, y, x + 3, y);
+        do Screen.drawLine(x, y - 3, x, y - 1);
+        do Screen.drawLine(x, y + 1, x, y + 3);
+        
+        return;
+    }
+
+    /** Change weapon type (1-4) */
+    method void setWeapon(int weapon) {
+        let weaponType = weapon;
+        return;
+    }
+
+    /** Hide cursor */
+    method void hide() {
+        if (visible) {
+            do erase();
+            let visible = false;
+        }
+        return;
+    }
+
+    /** Show cursor */
+    method void show() {
+        if (~visible) {
+            let visible = true;
+            do draw();
+        }
+        return;
+    }
+    
+    method int getX() {
+        return x;
+    }
+    
+    method int getY() {
+        return y;
+    }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

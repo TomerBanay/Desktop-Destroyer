@@ -1,0 +1,69 @@
+/** Chainsaw weapon - cuts jagged lines across the screen */
+class Chainsaw {
+    field int lastX, lastY;
+    field boolean hasLastPosition;
+    
+    constructor Chainsaw new() {
+        let hasLastPosition = false;
+        return this;
+    }
+
+    /** Cut from last position to current position with visible cutting effect */
+    method void activate(int x, int y) {
+        if (hasLastPosition) {
+            // Draw thick cutting line with rough edges
+            do Effects.drawJaggedLine(lastX, lastY, x, y);
+            
+            // Add more cutting marks along the path for visibility
+            do Screen.setColor(true);
+            
+            // Draw thick perpendicular cuts
+            do Screen.drawLine(lastX - 5, lastY - 2, lastX + 5, lastY - 2);
+            do Screen.drawLine(lastX - 5, lastY, lastX + 5, lastY);
+            do Screen.drawLine(lastX - 5, lastY + 2, lastX + 5, lastY + 2);
+            
+            do Screen.drawLine((lastX + x) / 2 - 6, (lastY + y) / 2 - 2, (lastX + x) / 2 + 6, (lastY + y) / 2 - 2);
+            do Screen.drawLine((lastX + x) / 2 - 6, (lastY + y) / 2, (lastX + x) / 2 + 6, (lastY + y) / 2);
+            do Screen.drawLine((lastX + x) / 2 - 6, (lastY + y) / 2 + 2, (lastX + x) / 2 + 6, (lastY + y) / 2 + 2);
+            
+            do Screen.drawLine(x - 5, y - 2, x + 5, y - 2);
+            do Screen.drawLine(x - 5, y, x + 5, y);
+            do Screen.drawLine(x - 5, y + 2, x + 5, y + 2);
+            
+            // Add vertical cuts too
+            do Screen.drawLine(lastX - 2, lastY - 5, lastX - 2, lastY + 5);
+            do Screen.drawLine(lastX, lastY - 5, lastX, lastY + 5);
+            do Screen.drawLine(lastX + 2, lastY - 5, lastX + 2, lastY + 5);
+            
+            do Screen.drawLine(x - 2, y - 5, x - 2, y + 5);
+            do Screen.drawLine(x, y - 5, x, y + 5);
+            do Screen.drawLine(x + 2, y - 5, x + 2, y + 5);
+        }
+        else {
+            // First activation - mark starting point with X cuts
+            do Screen.setColor(true);
+            do Screen.drawLine(x - 8, y - 8, x + 8, y + 8);
+            do Screen.drawLine(x - 8, y + 8, x + 8, y - 8);
+            do Screen.drawLine(x - 6, y - 6, x + 6, y + 6);
+            do Screen.drawLine(x - 6, y + 6, x + 6, y - 6);
+        }
+        
+        // Update last position
+        let lastX = x;
+        let lastY = y;
+        let hasLastPosition = true;
+        
+        return;
+    }
+
+    /** Reset chainsaw tracking */
+    method void reset() {
+         let hasLastPosition = false;
+        return;
+    }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

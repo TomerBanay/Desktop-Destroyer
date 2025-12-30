@@ -1,0 +1,43 @@
+/** Hammer weapon - creates shatter/crack patterns on click */
+class Hammer {
+    field int dummy;
+    
+    constructor Hammer new() {
+        let dummy = 0;
+        return this;
+    }
+    
+    /** Create hammer impact with animated cracks */
+    method void activate(int x, int y) {
+        // Draw impact crater
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, 10);
+        
+        // Draw radiating cracks with animation
+        do Effects.drawCrack(x, y, 0, 25);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 1, 20);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 2, 25);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 3, 20);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 4, 25);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 5, 20);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 6, 25);
+        do Sys.wait(15);
+        do Effects.drawCrack(x, y, 7, 20);
+        
+        // Darken area around impact
+        do Screen.drawCircle(x, y, 8);
+        
+        return;
+    }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

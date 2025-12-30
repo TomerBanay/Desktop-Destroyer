@@ -1,0 +1,438 @@
+function Effects.drawCrack 4
+    push argument 2
+    push constant 0
+    eq
+    not
+    if-goto Effects_1
+    push argument 3
+    pop local 2
+    push constant 0
+    pop local 3
+    goto Effects_0
+label Effects_1
+label Effects_0
+    push argument 2
+    push constant 1
+    eq
+    not
+    if-goto Effects_3
+    push argument 3
+    pop local 2
+    push argument 3
+    pop local 3
+    goto Effects_2
+label Effects_3
+label Effects_2
+    push argument 2
+    push constant 2
+    eq
+    not
+    if-goto Effects_5
+    push constant 0
+    pop local 2
+    push argument 3
+    pop local 3
+    goto Effects_4
+label Effects_5
+label Effects_4
+    push argument 2
+    push constant 3
+    eq
+    not
+    if-goto Effects_7
+    push argument 3
+    neg
+    pop local 2
+    push argument 3
+    pop local 3
+    goto Effects_6
+label Effects_7
+label Effects_6
+    push argument 2
+    push constant 4
+    eq
+    not
+    if-goto Effects_9
+    push argument 3
+    neg
+    pop local 2
+    push constant 0
+    pop local 3
+    goto Effects_8
+label Effects_9
+label Effects_8
+    push argument 2
+    push constant 5
+    eq
+    not
+    if-goto Effects_11
+    push argument 3
+    neg
+    pop local 2
+    push argument 3
+    neg
+    pop local 3
+    goto Effects_10
+label Effects_11
+label Effects_10
+    push argument 2
+    push constant 6
+    eq
+    not
+    if-goto Effects_13
+    push constant 0
+    pop local 2
+    push argument 3
+    neg
+    pop local 3
+    goto Effects_12
+label Effects_13
+label Effects_12
+    push argument 2
+    push constant 7
+    eq
+    not
+    if-goto Effects_15
+    push argument 3
+    pop local 2
+    push argument 3
+    neg
+    pop local 3
+    goto Effects_14
+label Effects_15
+label Effects_14
+    push argument 0
+    push local 2
+    add
+    pop local 0
+    push argument 1
+    push local 3
+    add
+    pop local 1
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push argument 0
+    push argument 1
+    push local 0
+    push local 1
+    call Screen.drawLine 4
+    pop temp 0
+    push argument 3
+    push constant 10
+    gt
+    not
+    if-goto Effects_17
+    push local 0
+    push constant 3
+    sub
+    push local 1
+    push local 0
+    push constant 3
+    add
+    push local 1
+    call Screen.drawLine 4
+    pop temp 0
+    push local 0
+    push local 1
+    push constant 3
+    sub
+    push local 0
+    push local 1
+    push constant 3
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    goto Effects_16
+label Effects_17
+label Effects_16
+    push constant 0
+    return
+function Effects.drawBulletHole 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push argument 0
+    push argument 1
+    push constant 2
+    call Screen.drawCircle 3
+    pop temp 0
+    push argument 0
+    push constant 4
+    sub
+    push argument 1
+    push constant 4
+    sub
+    push argument 0
+    push constant 2
+    sub
+    push argument 1
+    push constant 2
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push argument 0
+    push constant 2
+    add
+    push argument 1
+    push constant 2
+    sub
+    push argument 0
+    push constant 4
+    add
+    push argument 1
+    push constant 4
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push argument 0
+    push constant 4
+    sub
+    push argument 1
+    push constant 4
+    add
+    push argument 0
+    push constant 2
+    sub
+    push argument 1
+    push constant 2
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push argument 0
+    push constant 2
+    add
+    push argument 1
+    push constant 2
+    add
+    push argument 0
+    push constant 4
+    add
+    push argument 1
+    push constant 4
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push constant 0
+    return
+function Effects.drawJaggedLine 10
+    push constant 8
+    pop local 0
+    push argument 2
+    push argument 0
+    sub
+    push local 0
+    call Math.divide 2
+    pop local 6
+    push argument 3
+    push argument 1
+    sub
+    push local 0
+    call Math.divide 2
+    pop local 7
+    push argument 0
+    pop local 2
+    push argument 1
+    pop local 3
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push constant 0
+    pop local 1
+label Effects_18
+    push local 1
+    push local 0
+    lt
+    not
+    if-goto Effects_19
+    push local 2
+    push local 6
+    add
+    pop local 4
+    push local 3
+    push local 7
+    add
+    pop local 5
+    push local 1
+    push constant 7
+    call Math.multiply 2
+    push constant 3
+    and
+    push constant 1
+    sub
+    pop local 8
+    push local 1
+    push constant 11
+    call Math.multiply 2
+    push constant 3
+    and
+    push constant 1
+    sub
+    pop local 9
+    push local 4
+    push local 8
+    add
+    pop local 4
+    push local 5
+    push local 9
+    add
+    pop local 5
+    push local 2
+    push local 3
+    push local 4
+    push local 5
+    call Screen.drawLine 4
+    pop temp 0
+    push local 2
+    push constant 1
+    add
+    push local 3
+    push local 4
+    push constant 1
+    add
+    push local 5
+    call Screen.drawLine 4
+    pop temp 0
+    push local 4
+    pop local 2
+    push local 5
+    pop local 3
+    push local 1
+    push constant 1
+    add
+    pop local 1
+    goto Effects_18
+label Effects_19
+    push constant 0
+    return
+function Effects.animateWash 1
+    push argument 0
+    pop local 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+label Effects_20
+    push local 0
+    push argument 1
+    lt
+    not
+    if-goto Effects_21
+    push constant 0
+    push local 0
+    push constant 511
+    push local 0
+    call Screen.drawLine 4
+    pop temp 0
+    push constant 0
+    push local 0
+    push constant 1
+    add
+    push constant 511
+    push local 0
+    push constant 1
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push constant 5
+    call Sys.wait 1
+    pop temp 0
+    push local 0
+    push constant 4
+    add
+    pop local 0
+    goto Effects_20
+label Effects_21
+    push constant 0
+    return
+function Effects.drawExplosion 1
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push constant 0
+    pop local 0
+label Effects_22
+    push local 0
+    push constant 8
+    lt
+    not
+    if-goto Effects_23
+    push argument 0
+    push argument 1
+    push local 0
+    push argument 2
+    call Effects.drawCrack 4
+    pop temp 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto Effects_22
+label Effects_23
+    push argument 0
+    push argument 1
+    push argument 2
+    push constant 2
+    call Math.divide 2
+    call Screen.drawCircle 3
+    pop temp 0
+    push constant 0
+    return
+function Effects.drawShatter 1
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push argument 0
+    push argument 1
+    push constant 12
+    call Screen.drawCircle 3
+    pop temp 0
+    push constant 0
+    pop local 0
+label Effects_24
+    push local 0
+    push constant 8
+    lt
+    not
+    if-goto Effects_25
+    push argument 0
+    push argument 1
+    push local 0
+    push constant 20
+    call Effects.drawCrack 4
+    pop temp 0
+    push constant 20
+    call Sys.wait 1
+    pop temp 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto Effects_24
+label Effects_25
+    push constant 0
+    pop local 0
+label Effects_26
+    push local 0
+    push constant 8
+    lt
+    not
+    if-goto Effects_27
+    push argument 0
+    push argument 1
+    push local 0
+    push constant 30
+    call Effects.drawCrack 4
+    pop temp 0
+    push local 0
+    push constant 1
+    add
+    pop local 0
+    goto Effects_26
+label Effects_27
+    push constant 0
+    return

@@ -1,0 +1,427 @@
+/** Main game loop and state management */
+class Game {
+    field Desktop desktop;
+    field Cursor cursor;
+    field Hammer hammer;
+    field Chainsaw chainsaw;
+    field MachineGun machineGun;
+    field int currentWeapon;
+    field boolean running;
+    field int lastKey;
+    field int roundTime;
+    field int elapsedTime;
+    field int damageScore;
+    field int lastDisplayedScore;
+    field int roundNumber;
+    
+    /** Constructs a new game and initializes all game components and state. */
+    constructor Game new() {
+        let desktop = Desktop.new();
+        let cursor = Cursor.new(256, 128);
+        let hammer = Hammer.new();
+        let chainsaw = Chainsaw.new();
+        let machineGun = MachineGun.new();
+        
+        let currentWeapon = 1;  // Start with hammer
+        let running = true;
+        let lastKey = 0;
+        let roundTime = 20000;  // 20 seconds in milliseconds
+        let elapsedTime = 0;
+        let damageScore = 0;
+        let lastDisplayedScore = -1;  // Force initial display
+        let roundNumber = 1;  // Start at round 1
+        
+        return this;
+    }
+    
+    /** Main game loop that handles round progression and user decisions. */
+    method void run() {
+        var boolean playAgain;
+        let playAgain = true;
+        while (playAgain) {
+            /* Show initial screen with instructions (only on first round) */
+            if (roundNumber = 1) {
+                do showInstructions();
+                /* Wait for any key press and release */
+                while (Keyboard.keyPressed() = 0) {}
+                while (~(Keyboard.keyPressed() = 0)) {}
+            }
+            do playRound(); /* Play a single round */
+            let playAgain = showEndScreen(); /* Check if player wants to play again */
+        
+            /* Increment round number if playing again */
+            if (playAgain) {
+                let roundNumber = roundNumber + 1;
+            }
+        }
+        do showExitScreen(); /* Show exit screen before quitting */
+        return;
+    }
+    
+    /** Play one 20 second round. */
+    method void playRound() {
+        var int key;
+        var boolean keyWasPressed;
+        var int timeRemaining;
+        var int currentSecond, lastSecond;
+        
+        /* Reset state variables for the new round */
+        let damageScore = 0;
+        let elapsedTime = 0;
+        let lastSecond = -1;
+        let lastDisplayedScore = -1;  // Force score display update
+        
+        /* Draw the static desktop background and initial cursor */
+        do desktop.draw();
+        do cursor.draw();
+        
+        /* Initialize the HUD: weapon, timer, score, and round number */
+        do showWeaponIndicator();
+        do showTimer();
+        do showRound();
+        do showScore();
+        
+        let keyWasPressed = false;
+        
+        /* Execute the main logic loop for the duration of the round */
+        while (elapsedTime < roundTime) {
+            let key = Keyboard.keyPressed();
+            
+            /* Process input only when the key state changes to prevent repeats */
+            if ((key = 0) & keyWasPressed) {
+                let keyWasPressed = false;
+            }
+            
+            if ((~(key = 0)) & (~keyWasPressed)) {
+                let keyWasPressed = true;
+                
+                /* Map Arrow keys: 130=left, 131=up, 132=right, 133=down */
+                if (key = 131) { 
+                    do cursor.erase();
+                    do cursor.move(0, -8);
+                    do cursor.draw();
+                }
+                if (key = 133) { 
+                    do cursor.erase();
+                    do cursor.move(0, 8);
+                    do cursor.draw();
+                }
+                if (key = 130) { 
+                    do cursor.erase();
+                    do cursor.move(-8, 0);
+                    do cursor.draw();
+                }
+                if (key = 132) { 
+                    do cursor.erase();
+                    do cursor.move(8, 0);
+                    do cursor.draw();
+                }
+                
+                /* Handle Weapon selection: keys '1'-'3' */
+                if (key = 49) { 
+                    let currentWeapon = 1;
+                    do cursor.setWeapon(1);
+                    do showWeaponIndicator();
+                }
+                if (key = 50) { 
+                    let currentWeapon = 2;
+                    do cursor.setWeapon(2);
+                    do chainsaw.reset();
+                    do showWeaponIndicator();
+                }
+                if (key = 51) { 
+                    let currentWeapon = 3;
+                    do cursor.setWeapon(3);
+                    do showWeaponIndicator();
+                }
+                
+                /* Activate weapon on Space (32) or Enter (128) */
+                if ((key = 32) | (key = 128)) {
+                    do activateWeapon();
+                }
+            }
+            
+            /* Increment clock and update timer UI */
+            let elapsedTime = elapsedTime + 50;
+            let currentSecond = elapsedTime / 1000;
+            
+            if (~(currentSecond = lastSecond)) {
+                let lastSecond = currentSecond;
+                do showTimer();
+                
+                /* Display an alert when 5 seconds or less remain */
+                let timeRemaining = roundTime - elapsedTime;
+                if (timeRemaining < 6000) {
+                    do showTimeWarning();
+                }
+            }
+            
+            do Sys.wait(50);  // 50ms cycle speed
+        }
+        
+        return;
+    }
+    
+    /** Activates the current weapon at cursor position and updates score. */
+    method void activateWeapon() {
+        var int x, y;
+        var int oldScore;
+        
+        let x = cursor.getX();
+        let y = cursor.getY();
+        let oldScore = damageScore;
+        
+        /* Trigger specific weapon effect and add point value */
+        if (currentWeapon = 1) {
+            do hammer.activate(x, y);
+            let damageScore = damageScore + 25;  // Hammer: 25 pts
+        }
+        if (currentWeapon = 2) {
+            do chainsaw.activate(x, y);
+            let damageScore = damageScore + 15;  // Chainsaw: 15 pts
+        }
+        if (currentWeapon = 3) {
+            do machineGun.activate(x, y);
+            let damageScore = damageScore + 8;   // Machine Gun: 8 pts
+        }
+        
+        /* Refresh UI only if the score has changed */
+        if (~(damageScore = oldScore)) {
+            do showScore();
+        }
+        
+        return;
+    }
+    
+    /** Display game instructions - all text centered on 64-column screen. */
+    method void showInstructions() {
+        do Screen.clearScreen();
+        
+        /* Title and Credits */
+        do Output.moveCursor(1, 24);
+        do Output.printString("DESKTOP DESTROYER");
+        do Output.moveCursor(3, 27);
+        do Output.printString("Created by:");
+        do Output.moveCursor(4, 18);
+        do Output.printString("Rona, Adi, Yuval, and Tomer");
+        
+        /* Gameplay Objective */
+        do Output.moveCursor(6, 17);
+        do Output.printString("You have 20 seconds to destroy!");
+        
+        /* Control Scheme list */
+        do Output.moveCursor(9, 28);
+        do Output.printString("CONTROLS:");
+        do Output.moveCursor(10, 20);
+        do Output.printString("Arrow Keys - Move cursor");
+        do Output.moveCursor(11, 23);
+        do Output.printString("1 - Hammer (25 pts)");
+        do Output.moveCursor(12, 22);
+        do Output.printString("2 - Chainsaw (15 pts)");
+        do Output.moveCursor(13, 21);
+        do Output.printString("3 - Machine Gun (8 pts)");
+        do Output.moveCursor(14, 21);
+        do Output.printString("SPACE - Activate weapon");
+        
+        /* Footer Information */
+        do Output.moveCursor(17, 19);
+        do Output.printString("GOAL: Get the highest score!");
+        do Output.moveCursor(20, 21);
+        do Output.printString("Press any key to start!");
+        
+        return;
+    }
+    
+    /** Displays the remaining time in the top-left corner. */
+    method void showTimer() {
+        var int seconds;
+        let seconds = (roundTime - elapsedTime) / 1000;
+        if (seconds < 0) { let seconds = 0; }
+        
+        /* Clear the specific HUD area for the timer */
+        do Screen.setColor(false);
+        do Screen.drawRectangle(0, 0, 100, 15);
+        
+        /* Render the numeric countdown */
+        do Screen.setColor(true);
+        do Output.moveCursor(0, 1);
+        do Output.printString("TIME: ");
+        
+        /* Add a visual prompt when time is critical */
+        if (seconds < 6) {
+            do Output.printString(">> ");
+        }
+        
+        do Output.printInt(seconds);
+        
+        return;
+    }
+    
+    /** Displays the player's current accumulated damage points. */
+    method void showScore() {
+        /* Abort if the score has not changed since last update */
+        if (damageScore = lastDisplayedScore) {
+            return;
+        }
+        
+        let lastDisplayedScore = damageScore;
+        
+        /* Clear the score area located above the taskbar */
+        do Screen.setColor(false);
+        do Screen.drawRectangle(380, 220, 511, 235);
+        
+        /* Render the new score value */
+        do Screen.setColor(true);
+        do Output.moveCursor(20, 48);
+        do Output.printString("PTS:");
+        do Output.printInt(damageScore);
+        
+        return;
+    }
+    
+    /** Flashes a warning message when time is low. */
+    method void showTimeWarning() {
+        /* Draw a highlighted box on the right side of the screen */
+        do Screen.setColor(true);
+        do Screen.drawRectangle(360, 110, 500, 130);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(362, 112, 498, 128);
+        
+        /* Display the urgency text */
+        do Screen.setColor(true);
+        do Output.moveCursor(10, 46);
+        do Output.printString("HURRY!");
+        
+        /* Delay for the flash effect and then clear the box */
+        do Sys.wait(200);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(360, 110, 500, 130);
+        
+        return;
+    }
+    
+    /** Shows the currently selected weapon name in the top-right corner. */
+    method void showWeaponIndicator() {
+        /* Refresh the indicator region */
+        do Screen.setColor(false);
+        do Screen.drawRectangle(400, 0, 511, 15);
+        
+        /* Print weapon name based on current index */
+        do Screen.setColor(true);
+        do Output.moveCursor(0, 50);
+        
+        if (currentWeapon = 1) { do Output.printString("HAMMER"); }
+        if (currentWeapon = 2) { do Output.printString("CHAINSAW"); }
+        if (currentWeapon = 3) { do Output.printString("M-GUN"); }
+        
+        return;
+    }
+    
+    /** Shows the end game screen with final score and replay options. */
+    method boolean showEndScreen() {
+        var int key;
+        do cursor.hide();
+        do Screen.clearScreen();
+        
+        /* Main status and final score summary */
+        do Output.moveCursor(5, 27);
+        do Output.printString("TIME'S UP!");
+        do Output.moveCursor(8, 26);
+        do Output.printString("FINAL SCORE:");
+        do Output.moveCursor(9, 30);
+        do Output.printInt(damageScore);
+        
+        /* Display context-sensitive encouragement based on score brackets */
+        if (damageScore > 800) {
+            do Output.moveCursor(12, 24);
+            do Output.printString("YOU ARE AWESOME!");
+        }
+        if ((damageScore > 500) & (damageScore < 801)) {
+            do Output.moveCursor(12, 27);
+            do Output.printString("GREAT JOB!");
+        }
+        if ((damageScore > 300) & (damageScore < 501)) {
+            do Output.moveCursor(12, 27);
+            do Output.printString("NICE WORK!");
+        }
+        if ((damageScore > 150) & (damageScore < 301)) {
+            do Output.moveCursor(12, 27);
+            do Output.printString("KEEP GOING!");
+        }
+        if (damageScore < 151) {
+            do Output.moveCursor(12, 24);
+            do Output.printString("KEEP PRACTICING!");
+        }
+        
+        /* Player choice instructions */
+        do Output.moveCursor(16, 25);
+        do Output.printString("R - Play Again");
+        do Output.moveCursor(17, 26);
+        do Output.printString("Q - Quit Game");
+        
+        /* Wait loop for user input to either restart or quit */
+        while (true) {
+            let key = Keyboard.keyPressed();
+            if ((key = 82) | (key = 114)) { return true; }   // R key
+            if ((key = 81) | (key = 113)) { return false; }  // Q key
+            do Sys.wait(50);
+        }
+        
+        return false;
+    }
+    
+    /** Displays the current round number below the weapon indicator. */
+    method void showRound() {
+        /* Refresh the round information area */
+        do Screen.setColor(false);
+        do Screen.drawRectangle(400, 22, 511, 37);
+        
+        /* Render current round integer */
+        do Screen.setColor(true);
+        do Output.moveCursor(2, 50);
+        do Output.printString("ROUND: ");
+        do Output.printInt(roundNumber);
+        
+        return;
+    }
+    
+    /** Displays the final exit screen with credits and session stats. */
+    method void showExitScreen() {
+        var int key;
+        do cursor.hide();
+        do Screen.clearScreen();
+        
+        /* Centered thank you message and credits */
+        do Output.moveCursor(8, 21);
+        do Output.printString("Thank you for playing!");
+        do Output.moveCursor(11, 27);
+        do Output.printString("Created by:");
+        do Output.moveCursor(12, 18);
+        do Output.printString("Rona, Adi, Yuval, and Tomer");
+        
+        /* Final session statistics */
+        do Output.moveCursor(15, 18);
+        do Output.printString("Rounds completed: ");
+        do Output.printInt(roundNumber);
+        
+        /* Exit prompt and wait for final key press */
+        do Output.moveCursor(19, 21);
+        do Output.printString("Press any key to exit");
+        
+        while (Keyboard.keyPressed() = 0) {}
+        while (~(Keyboard.keyPressed() = 0)) {}
+        
+        return;
+    }
+    
+    /** Deallocates the game object and its field objects. */
+    method void dispose() {
+        do desktop.dispose();
+        do cursor.dispose();
+        do hammer.dispose();
+        do chainsaw.dispose();
+        do machineGun.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}

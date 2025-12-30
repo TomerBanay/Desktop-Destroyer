@@ -1,0 +1,49 @@
+/** Machine gun weapon - rapid-fire bullet holes */
+class MachineGun {
+    field int shotCount;
+    
+    constructor MachineGun new() {
+        let shotCount = 0;
+        return this;
+    }
+    
+    /** Fire bullet at position with slight spread */
+    method void activate(int x, int y) {
+        var int offsetX, offsetY;
+        var int actualX, actualY;
+        
+        // Calculate random spread based on shot count
+        let offsetX = ((shotCount * 7) & 7) - 3;  // -3 to 4
+        let offsetY = ((shotCount * 11) & 7) - 3;
+        
+        let actualX = x + offsetX;
+        let actualY = y + offsetY;
+        
+        // Draw bullet hole
+        do Effects.drawBulletHole(actualX, actualY);
+        
+        // Increment shot counter
+        let shotCount = shotCount + 1;
+        if (shotCount > 100) {
+            let shotCount = 0;
+        }
+        return;
+    }
+    
+    /** Fire multiple shots rapidly */
+    method void rapidFire(int x, int y, int shots) {
+        var int i;
+        let i = 0;
+        while (i < shots) {
+            do activate(x, y);
+            do Sys.wait(30);
+            let i = i + 1;
+        }
+        return;
+    }
+    
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

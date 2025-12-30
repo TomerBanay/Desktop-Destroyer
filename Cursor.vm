@@ -1,0 +1,224 @@
+function Cursor.new 0
+    push constant 4
+    call Memory.alloc 1
+    pop pointer 0
+    push argument 0
+    pop this 0
+    push argument 1
+    pop this 1
+    push constant 1
+    pop this 2
+    push constant 1
+    neg
+    pop this 3
+    push pointer 0
+    return
+function Cursor.move 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    push argument 1
+    add
+    pop this 0
+    push this 1
+    push argument 2
+    add
+    pop this 1
+    push this 0
+    push constant 20
+    lt
+    not
+    if-goto Cursor_1
+    push constant 20
+    pop this 0
+    goto Cursor_0
+label Cursor_1
+label Cursor_0
+    push this 0
+    push constant 491
+    gt
+    not
+    if-goto Cursor_3
+    push constant 491
+    pop this 0
+    goto Cursor_2
+label Cursor_3
+label Cursor_2
+    push this 1
+    push constant 20
+    lt
+    not
+    if-goto Cursor_5
+    push constant 20
+    pop this 1
+    goto Cursor_4
+label Cursor_5
+label Cursor_4
+    push this 1
+    push constant 220
+    gt
+    not
+    if-goto Cursor_7
+    push constant 220
+    pop this 1
+    goto Cursor_6
+label Cursor_7
+label Cursor_6
+    push constant 0
+    return
+function Cursor.draw 0
+    push argument 0
+    pop pointer 0
+    push constant 1
+    neg
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push constant 3
+    sub
+    push this 1
+    push this 0
+    push constant 1
+    sub
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 1
+    add
+    push this 1
+    push this 0
+    push constant 3
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push constant 3
+    sub
+    push this 0
+    push this 1
+    push constant 1
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push constant 1
+    add
+    push this 0
+    push this 1
+    push constant 3
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push constant 0
+    return
+function Cursor.erase 0
+    push argument 0
+    pop pointer 0
+    push constant 0
+    call Screen.setColor 1
+    pop temp 0
+    push this 0
+    push constant 3
+    sub
+    push this 1
+    push this 0
+    push constant 1
+    sub
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push constant 1
+    add
+    push this 1
+    push this 0
+    push constant 3
+    add
+    push this 1
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push constant 3
+    sub
+    push this 0
+    push this 1
+    push constant 1
+    sub
+    call Screen.drawLine 4
+    pop temp 0
+    push this 0
+    push this 1
+    push constant 1
+    add
+    push this 0
+    push this 1
+    push constant 3
+    add
+    call Screen.drawLine 4
+    pop temp 0
+    push constant 0
+    return
+function Cursor.setWeapon 0
+    push argument 0
+    pop pointer 0
+    push argument 1
+    pop this 2
+    push constant 0
+    return
+function Cursor.hide 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    not
+    if-goto Cursor_9
+    push pointer 0
+    call Cursor.erase 1
+    pop temp 0
+    push constant 0
+    pop this 3
+    goto Cursor_8
+label Cursor_9
+label Cursor_8
+    push constant 0
+    return
+function Cursor.show 0
+    push argument 0
+    pop pointer 0
+    push this 3
+    not
+    not
+    if-goto Cursor_11
+    push constant 1
+    neg
+    pop this 3
+    push pointer 0
+    call Cursor.draw 1
+    pop temp 0
+    goto Cursor_10
+label Cursor_11
+label Cursor_10
+    push constant 0
+    return
+function Cursor.getX 0
+    push argument 0
+    pop pointer 0
+    push this 0
+    return
+function Cursor.getY 0
+    push argument 0
+    pop pointer 0
+    push this 1
+    return
+function Cursor.dispose 0
+    push argument 0
+    pop pointer 0
+    push pointer 0
+    call Memory.deAlloc 1
+    pop temp 0
+    push constant 0
+    return
